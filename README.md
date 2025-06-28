@@ -1,6 +1,6 @@
 # PhD Dissertation
 
-Welcome to the repository for the chapter *"The Impacts of Trade Agreements on Land Use in Brazil."* This chapter employs an exact hat algebra model, following Caliendo and Parro (2017) and Maggi (2017). However, instead of assuming labor mobility across Brazilian states, we allow for intrastate land use changes. For instance, we find that a stricter trade agreement on primary factors by the EU—within the context of the EU-Mercosur Trade Agreement (EMTA)—does not necessarily lead to reduced land use.
+Welcome to the repository for the chapter *"The Impacts of Trade Agreements on Land Use in Brazil."* This chapter employs an exact hat algebra model, following Caliendo and Parro (2017) and Maggi (2017). However, instead of assuming labor mobility across Brazilian states, we allow for intrastate land use changes. For instance, we find that a stricter trade agreement on primary factors by the EU—within the context of the EU-Mercosur Trade Agreement (EMTA)—does not necessarily lead to reduced land use. 
 
 The PhD dissertation is composed of two chapters: this general equilibrium model and a game theory model. Working papers for both chapters can be found on my website: [https://alanleal-econ.com/index.php/research/](https://alanleal-econ.com/index.php/research/).  
 Questions regarding the dissertation or the code can be directed to: **prof@alanleal-econ.com**.
