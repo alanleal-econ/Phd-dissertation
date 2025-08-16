@@ -1,5 +1,9 @@
 # Main code
 # Created by Alan Leal. E-mail: prof@alanleal-econ.com
+# Setting random number generator seed
+using Random
+Random.seed!(12345)
+# Setting main dimensions of analysis
 N=70
 J=26
 hat_kappa_nij=ones(N,N,J)
@@ -12,7 +16,7 @@ hat_kappa_nij[:,:,:].=1
 # Scenario i - Economy-wide trade cost reduction
 hat_kappa_nij[br_codes,eu_codes,1:15].=0.7646
 hat_kappa_nij[eu_codes,br_codes,1:15].=0.7646
-# Scenario ii - Primary sectors surcharge, with trade cost reduction in all other sectors
+# Scenario ii - Primary sectors surcharge, with trade cost reduction in all other sectors (do not run the two scenarios simultaneously)
 hat_kappa_nij[br_codes,eu_codes,4:26].=0.7646
 hat_kappa_nij[eu_codes,br_codes,4:26].=0.7646
 hat_kappa_nij[br_codes,eu_codes,1:3].=1.5 #50% increase in the trade cost
@@ -31,6 +35,7 @@ using Optim
 using NLsolve
 using NaNStatistics
 using JuMP, Ipopt
+using MAT
 
 
 # Loading functions:
@@ -40,6 +45,18 @@ include("eq3.jl")
 include("eq4_h_endog_v2.jl")
 include("eq5_H_var.jl")
 include("eq6_H_var.jl")
+# Reading Julia files:
+matfile = matopen(joinpath(@__DIR__, "land_emta_workspace.mat"))
+
+# read all variables into a Dict
+vars = read(matfile)  # this will give a Dict{String, Any}
+close(matfile)
+
+# assign each variable into Main (global environment)
+for (name, value) in vars
+    @eval Main $(Symbol(name)) = $value
+end
+theta_j=[theta_trad;0;0;0;0;0;0;0;0;0;0;0]
 # Creating empty objects of interest:
 hat_P_nj=ones(N,J)
 hat_x_ij=ones(N,J)
@@ -75,6 +92,22 @@ while epsilon>10^(-3) && cont<=1000
     end
 
     # Defining Lb:
+    Ln=[330718.29596203496; 269373.7540764827; 1.6342092793744425e6; 2.6409406239575744e6; 
+    892485.6986513566; 204070.7939593827; 766550.8297753842; 1.2192035032174056e6; 6.2751926114648e6;
+     3.982009057257481e6; 3.0868969110826906e6; 1.5575246580823185e6; 3.600423262728252e6; 
+     1.3281988381358038e6; 959596.9739186086; 1.4053323082030565e6; 2.3776472906421227e6;
+      2.9627233969011703e6; 2.2412426923678033e6; 1.3640796070238124e6; 1.611736216342898e6;
+       8.92830198571447e6; 7.215148318221671e6; 2.307831066835844e7; 6.022835228605557e6;
+        3.7742489898619703e6; 6.503607206113008e6; 9412.000600905001; 6092.612504000001; 
+        6580.65336; 2961.945252; 16969.07724031; 4222.810013910001; 113085.44243957999; 
+        585.496064; 312.92431923600003; 60792.57640000001; 582.474825; 31701.476120000003;
+         965.6735467277122; 3803.63588; 40517.5984; 55702.83468; 7157.001048; 362.91449193999995;
+          24.599652121600002; 12.017682402002999; 10949.566221823101; 3173.6775320000006; 
+          37540.11088000001; 632.4439141727522; 20.09306803743; 2114.4589218529923; 
+          518.1628400000001; 1587.3898323949802; 3443.0741831523; 247.66801199999998; 
+          13222.492; 476.3852; 6677.0258176; 7514.434864000001; 3764.394924; 3236.2883481955;
+           3213.0124076232005; 1479.7865880000002; 711.519828; 17184.278805392998; 
+           609.7830377256719; 157084.392; 98368.59322589402]
     Lb = [sum(Ln[1:27]); Ln[28:69]]
     # Calculating the new equilibria of structures and land use:
     hat_H_n1=hat_H_n[1:27]
@@ -114,71 +147,19 @@ while epsilon>10^(-3) && cont<=1000
     cont=cont+1
 end
 
-# Calculating TFP
+# TFP
 tfp=zeros(N,J)
 for n=1:N,j=1:J
     tfp[n,j]=exp(log((hat_T_nj[n,j]^gamma_nj[n,j])/((pi_nij_l[n,n,j]/pi_nij[n,n,j])^(1/theta_j[j]))))
 end
-hat_w_n=hat_omega_n0.*(hat_L_n.^(-beta_n))
-DP=zeros(N*J,N)
-PQ_vec=reshape(X_nk_l,1,J*N)'
-for n=1:N
-    DP[:,n]=reshape(pi_nij_l[n,:,:],N*J,1).*PQ_vec
-end
-aux_w=ones(J,1)*hat_w_n'
-Exjn=zeros(J,N)
-for j=1:J,n=1:N
-    Exjn[j,n]=sum(DP[1+N*(j-1):N*J,n])'
-end
-PQ_vec0=reshape(X_nj',1,J*N)'
-DPO=zeros(N*J,N)
-for n=1:N
-    DPO[:,n]=reshape(pi_nij[n,:,:],N*J,1).*PQ_vec0
-end
-Exjn0=zeros(J,N)
-for n=1:N,j=1:J
-    Exjn0[j,n]=sum(DPO[1+N*(j-1):N*j,n])
-end
-VALjn=gamma_nj.*(1 .- beta_n).*Exjn0'
-hat_L_nj=((1 ./VALjn).*aux_w').*gamma_nj.*(1 .-beta_n).*Exjn'
-# Calculating the GDP:
-gdp=zeros(N,J)
-for n=1:N,j=1:J
-    gdp[n,j]=exp(log(tfp[n,j])+log(hat_L_nj[n,j])+log(hat_w_n[n]/hat_x_ij[n,j]))
-end
-
-# Aggregated Metrics
-# Região
-# TFP
 tfp_n=zeros(N)
 for n=1:N
     tfp_n[n]=sum(Y_nj[n,:]./sum(Y_nj[n,j] for j=1:J).*tfp[n,:])
 end
-# GDP
-VARjn=(beta_n./(1 .-beta_n)).*VALjn
-GDPnj_hat = ((hat_L_nj.*kron(ones(J,1),hat_omega_n0')')./hat_P_nj)
-VAjn0  = VALjn + VARjn
-VAj0 = sum(VAjn0',dims=2)
-VAn0 = sum(VAjn0,dims=2)
-VA0 = sum(VAj0)
-GDP_n=zeros(N)
-for n = 1:N
-    GDP_n[n] = sum((VAjn0[n,:]./sum(VAjn0[n,j] for j=1:J)).*(GDPnj_hat[n,:]))
+# Relevant Metrics
+welfare=zeros(N)
+for n=1:N
+    wn=hat_omega_n0[n]
+    welfare[n]=exp(sum(alpha_nj[n,:].*(log.(tfp[n,:])-log.(wn./hat_x_ij[n,:]))))
 end
-
-
-# Sector 
-# TFP
-tfp_j=zeros(J)
-for j=1:J
-    tfp_j[j]=sum(Y_nj[:,j]./sum(Y_nj[n,j] for n=1:N).*tfp[:,j])
-end
-tfp_j[isnan.(tfp_j)].=1
-# GDP
-GDPj=zeros(J)
-for j = 1:J
-    GDPj[j] = nansum((VAjn0[:,j]./sum(VAjn0[n,j] for n=1:N)).*(GDPnj_hat[:,j]))
-end
-
-# Aggregated GDP
-AGDP = nansum((VAj0./VA0)'.*GDPj')
+hat_H_n
