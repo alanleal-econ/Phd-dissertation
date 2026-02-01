@@ -6,7 +6,7 @@ The PhD dissertation is composed of two chapters: this general equilibrium model
 Questions regarding the dissertation or the code can be directed to: **prof@alanleal-econ.com**.
 
 Due to GitHub’s file size limitations, the dataset for this chapter is hosted in the following Dropbox folder:  
-[https://www.dropbox.com/scl/fo/vcdq93ktwfczrv06dac14/ALtbVa38YuQn25E6BujrrvM?rlkey=fc24uvuh4iblcsnw9nlw34dp2&st=zq2ugc0m&dl=0](https://www.dropbox.com/scl/fo/vcdq93ktwfczrv06dac14/ALtbVa38YuQn25E6BujrrvM?rlkey=fc24uvuh4iblcsnw9nlw34dp2&st=zq2ugc0m&dl=0)  
+[Alan Leal-Econ Sharepoint](https://alanlealecon.sharepoint.com/:f:/s/AlanLeal/IgCBrhKEQlOgQJlb7p_Em_l9AfsJ4oU-tatXPD3LEtkdPv4?e=00ssJd)  
 The code is also available in this folder and is kept updated alongside this repository.
 
 Julia and MATLAB code implements the general equilibrium model, while R code implements the game theory model. 
