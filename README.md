@@ -5,7 +5,7 @@ Welcome to the repository for my Ph.D. dissertation. This repository contains th
 The PhD dissertation is composed of two chapters: this general equilibrium model and a game theory model. Working papers for both chapters can be found on my website: [https://alanleal-econ.com/index.php/research/](https://alanleal-econ.com/index.php/research/).  
 Questions regarding the dissertation or the code can be directed to: **prof@alanleal-econ.com**.
 
-Due to GitHub’s file size limitations, the dataset for this chapter is hosted in the following Dropbox folder:  
+Due to GitHub’s file size limitations, the dataset for this chapter is hosted in the following folder:  
 [Alan Leal-Econ Sharepoint](https://alanlealecon.sharepoint.com/:f:/s/AlanLeal/IgCBrhKEQlOgQJlb7p_Em_l9AfsJ4oU-tatXPD3LEtkdPv4?e=00ssJd)  
 The code is also available in this folder and is kept updated alongside this repository.
 
